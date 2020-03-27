@@ -1,4 +1,9 @@
 import streamlit as st
+import SessionState
+
+state = SessionState.get(key=0)
+
+ta_placeholder = st.empty()
 
 st.sidebar.header("Mots clés")
 st.sidebar.markdown("Ecrivez les mots clés séparés par une virgule et un espace")
@@ -28,25 +33,27 @@ def return_grade(text, list_words):
 			if word in text:
 				count += 1
 				list_in.append(word)
-
 		return list_in, count
 	else:
 		return [], 0
 
+if st.button('Effacer le texte'):
+    state.key += 1
+
 st.subheader("Q1")
-txt1 = st.text_area("Texte Q1")
+txt1 = st.text_area("Texte Q1",  value='', key=state.key)
 ret_q1 = return_grade(txt1, w1)
 st.write("Mots identifiés: ", ', '.join(ret_q1[0]))
 st.write("Points: ", ret_q1[1])
 
 st.subheader("Q2")
-txt2 = st.text_area("Texte Q2")
+txt2 = st.text_area("Texte Q2",  value='', key=state.key)
 ret_q2 = return_grade(txt2, w2)
 st.write("Mots identifiés: ", ', '.join(ret_q2[0]))
 st.write("Points: ", ret_q2[1])
 
 st.subheader("Q3")
-txt3 = st.text_area("Texte Q3")
+txt3 = st.text_area("Texte Q3",  value='', key=state.key)
 ret_q3 = return_grade(txt3, w3)
 st.write("Mots identifiés: ", ', '.join(ret_q3[0]))
 st.write("Points: ", ret_q3[1])
