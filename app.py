@@ -18,8 +18,10 @@ st.header("Notation automatique")
 st.write("Collez le texte de l'élève dans la question appropriée")
 
 def return_grade(text, list_words):
+	text = text.lower()
 	if list_words != "":
 		list_words = list_words.split(", ")
+		list_words = [l.lower() for l in list_words]
 		count = 0 
 		list_in = []
 		for word in list_words:
