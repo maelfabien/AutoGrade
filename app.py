@@ -18,15 +18,18 @@ st.header("Notation automatique")
 st.write("Collez le texte de l'élève dans la question appropriée")
 
 def return_grade(text, list_words):
-	list_words = list_words.split(", ")
-	count = 0 
-	list_in = []
-	for word in list_words:
-		if word in text:
-			count += 1
-			list_in.append(word)
+	if list_words != "":
+		list_words = list_words.split(", ")
+		count = 0 
+		list_in = []
+		for word in list_words:
+			if word in text:
+				count += 1
+				list_in.append(word)
 
-	return list_in, count
+		return list_in, count
+	else:
+		return [], 0
 
 st.subheader("Q1")
 txt1 = st.text_area("Texte Q1")
