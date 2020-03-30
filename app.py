@@ -25,7 +25,7 @@ def return_grade(text, list_words):
 
 	text = text.split()
 	text = ' '.join([stemmer.stem(t) for t in text])
-	st.write(text)
+
 	if list_words != "":
 		list_words = list_words.split(", ")
 		list_words = [l.lower() for l in list_words]
