@@ -1,9 +1,7 @@
 import streamlit as st
-#import SessionState
 
-#state = SessionState.get(key=0)
-
-#ta_placeholder = st.empty()
+from nltk.stem.snowball import FrenchStemmer
+stemmer = FrenchStemmer()
 
 st.sidebar.header("Mots clés")
 st.sidebar.markdown("Ecrivez les mots clés séparés par une virgule et un espace")
@@ -24,6 +22,10 @@ st.write("Collez la réponse de l'élève dans la question appropriée")
 
 def return_grade(text, list_words):
 	text = text.lower()
+
+	text = text.split()
+	text = ' '.join([stemmer.stem(t) for t in text])
+	st.write(text)
 	if list_words != "":
 		list_words = list_words.split(", ")
 		list_words = [l.lower() for l in list_words]
@@ -31,10 +33,13 @@ def return_grade(text, list_words):
 		list_in = []
 
 		for word in list_words:
+
+			word = ' '.join([stemmer.stem(w) for w in word.split()])
+
 			if word in text:
-				if all(w in text.split() for w in word.split()):
-					count += 1
-					list_in.append(word)
+				count += 1
+				list_in.append(word)
+
 		return list_in, count
 	else:
 		return [], 0
@@ -47,6 +52,8 @@ if st.button('Effacer les réponses'):
 st.subheader("Q1")
 txt1 = st.text_area("Texte Q1",  value='', key=key)
 ret_q1 = return_grade(txt1, w1)
+
+
 st.write("Mots identifiés: ", ', '.join(ret_q1[0]))
 st.write("Points: ", ret_q1[1])
 
