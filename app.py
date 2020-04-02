@@ -92,7 +92,7 @@ def return_grade(text, list_words):
                         count += 1
                         list_in.append(word)
                         sent = sent.replace(word, '<mark data-entity="OK">%s</mark>'%(word))
-
+                        text = text.replace(w, "")
                 else:
                     if 1 - levenshtein(word, w)/(max(len(word), len(w))) >= 0.45:
                         sent = sent.replace(w, '<mark data-entity="NOK">%s</mark>'%(w))
