@@ -66,13 +66,15 @@ def rmv_acc(string_1):
 
 
 def return_grade(text, list_words):
-
+    
     text = text.lower()
+    text2 = text
+
     text = text.split()
     text = ' '.join([rmv_acc(stemmer.stem(t)) for t in text])
     start = '<div class="entities"> '
     end = ' </div>'
-    sent = start + text + end
+    sent = start + text2 + end
 
     if list_words != "":
         list_words = list_words.split(", ")
@@ -82,20 +84,33 @@ def return_grade(text, list_words):
 
         for word in list_words:
 
-            word = ' '.join([stemmer.stem(w) for w in word.split()])
             word = rmv_acc(word)
 
-            for w in text.split():
+            if word in text2:
+                if word not in list_in:
+                    sent = sent.replace(word, '<mark data-entity="OK">%s</mark>'%(word))
+                    count += 1
 
-                if word in w:
-                    if word not in list_in:
-                        count += 1
-                        list_in.append(word)
-                        sent = sent.replace(word, '<mark data-entity="OK">%s</mark>'%(word))
-                        text = text.replace(w, "")
-                else:
-                    if 1 - levenshtein(word, w)/(max(len(word), len(w))) >= 0.45:
-                        sent = sent.replace(w, '<mark data-entity="NOK">%s</mark>'%(w))
+                    list_in.append(' '.join([stemmer.stem(w) for w in word.split()]))
+
+            else:
+                word = ' '.join([stemmer.stem(w) for w in word.split()])
+                k = 0
+
+                for w in text.split():
+
+                    if word in w:
+                        if word not in list_in:
+                            count += 1
+
+                            list_in.append(' '.join([stemmer.stem(w) for w in word.split()])) #text2.split()[k])
+                            sent = sent.replace(text2.split()[k], '<mark data-entity="OK">%s</mark>'%(text2.split()[k]))
+
+                    else:
+                        if 1 - levenshtein(word, w)/(max(len(word), len(w))) >= 0.6:
+                            
+                            sent = sent.replace(text2.split()[k], '<mark data-entity="NOK">%s</mark>'%(text2.split()[k]))
+                    k+=1
 
         return list_in, count, sent
     else:
