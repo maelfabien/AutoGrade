@@ -2,32 +2,29 @@ import streamlit as st
 import string
 from collections import Counter
 
-from nltk.stem.snowball import FrenchStemmer
-stemmer = FrenchStemmer()
+from nltk.stem.porter import *
+stemmer = PorterStemmer()
 
 punc = string.punctuation
 
 with open('css.txt') as f:
     st.markdown('<style>{}</style>'.format(f.read()), unsafe_allow_html=True)
 
-st.sidebar.header("Mots clés")
+st.sidebar.header("Key words")
 st.sidebar.markdown(
-    "Ecrivez les mots clés, dans leur forme courte, séparés par une virgule et un espace")
-st.sidebar.markdown("*Ex: mot1, mot2*")
+    "Write the keywords you are looking for. Split them by a comma.")
+st.sidebar.markdown("*Eg: word1, word2, word3*")
+
+w1 = st.sidebar.text_input("Words you're looking for?")
+
+st.header("Where's the word? Automatic grading")
+
+st.markdown("Paste your text in the text area below. The application will look for words sharing similar roots or that are close. Words matching are in orange, words not matching but quite similar are in purple. A matching score is then displayed")
 
 st.sidebar.markdown("---")
-st.sidebar.subheader("Q1")
-w1 = st.sidebar.text_input("Mots Q1")
-
-st.sidebar.subheader("Q2")
-w2 = st.sidebar.text_input("Mots Q2")
-
-st.sidebar.subheader("Q3")
-w3 = st.sidebar.text_input("Mots Q3")
-
-st.header("Notation automatique")
-st.write("Collez la réponse de l'élève dans la question appropriée")
-
+st.sidebar.subheader("What is it?")
+st.sidebar.markdown("This tool is meant for teachers who want to automatically detect keywords in a text written by their students (typically remote school work duing the COVID-19 crisis).")
+st.sidebar.markdown("At the end, a 'score' is proposed. It shows how many of the words you were looking for found a match, e.g. if you were looking for 5 words and it found 4, the score will be 4.")
 
 def rmv_acc(string_1):
 
@@ -88,7 +85,7 @@ def return_grade(text, list_words):
 
             if word in text2:
                 if word not in list_in:
-                    sent = sent.replace(word, '<mark data-entity="OK">%s</mark>'%(word))
+                    sent = sent.replace(word, ' <mark entity="OK">%s</mark> '%(word))
                     count += 1
 
                     list_in.append(' '.join([stemmer.stem(w) for w in word.split()]))
@@ -104,12 +101,12 @@ def return_grade(text, list_words):
                             count += 1
 
                             list_in.append(' '.join([stemmer.stem(w) for w in word.split()])) #text2.split()[k])
-                            sent = sent.replace(text2.split()[k], '<mark data-entity="OK">%s</mark>'%(text2.split()[k]))
+                            sent = sent.replace(text2.split()[k], ' <mark entity="OK">%s</mark> '%(text2.split()[k]))
 
                     else:
                         if 1 - levenshtein(word, w)/(max(len(word), len(w))) >= 0.6:
                             
-                            sent = sent.replace(text2.split()[k], '<mark data-entity="NOK">%s</mark>'%(text2.split()[k]))
+                            sent = sent.replace(text2.split()[k], ' <mark entity="NOK">%s</mark> '%(text2.split()[k]))
                     k+=1
 
         return list_in, count, sent
@@ -155,27 +152,12 @@ def levenshtein(s, t):
 
 key = 0
 
-if st.button('Effacer les réponses'):
+if st.button('Erase answer'):
     key += 1
 
-st.subheader("Q1")
-txt1 = st.text_area("Texte Q1",  value='', key=key)
+st.subheader("Answer")
+txt1 = st.text_area("Paste answer here",  value='', key=key)
 ret_q1 = return_grade(txt1, w1)
 st.markdown(ret_q1[2], unsafe_allow_html=True)
-st.markdown("***Mots identifiés: ***%s"%(', '.join(ret_q1[0])))
+st.markdown("***Words identified: ***%s"%(', '.join(ret_q1[0])))
 st.write("Points: ", ret_q1[1])
-
-
-st.subheader("Q2")
-txt2 = st.text_area("Texte Q2",  value='', key=key)
-ret_q2 = return_grade(txt2, w2)
-st.markdown(ret_q2[2], unsafe_allow_html=True)
-st.markdown("***Mots identifiés: ***%s"%(', '.join(ret_q2[0])))
-st.write("Points: ", ret_q2[1])
-
-st.subheader("Q3")
-txt3 = st.text_area("Texte Q3",  value='', key=key)
-ret_q3 = return_grade(txt3, w3)
-st.markdown(ret_q3[2], unsafe_allow_html=True)
-st.markdown("***Mots identifiés: ***%s"%(', '.join(ret_q3[0])))
-st.write("Points: ", ret_q3[1])
